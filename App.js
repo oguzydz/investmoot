@@ -55,17 +55,38 @@ export default function App() {
 
 
     useEffect(() => {
-        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+        registerForPushNotificationsAsync().then(async token => {
+            
+            setExpoPushToken(token);
+            await fetch('https://investmoot.com/mpanel/index.php?route=token&token='+token + '&secure=68acd56ccd828119310ebda41741ea5a1dde1ae2');
+
+        });
 
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
             setNotification(notification);
         });
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
-            alert("Bildirim geldi")
+           
 
-            console.log(response.data)
+            const {type, msg} = notification.data;
+
+            if (type !== "") {
+
+                if (type == 'update') {
+                    
+                    Linking.openURL("https://play.google.com/store/apps/details?id=com.investmoot");
+    
+                } else if (type == 'url'){
+                    
+                    const url = msg;
+                    setWebViewUrl(url)
+
+                }
+            } else {
+                console.log('data yok');
+            }
+    
 
         });
 
